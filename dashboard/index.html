@@ -41,8 +41,6 @@
             font-family: 'Cairo', sans-serif;
             background-color: #051619;
             color: #f3f4f6;
-            scrollbar-width: thin;
-            scrollbar-color: #d4af37 #051619;
         }
         /* Custom dynamic background glow */
         .glass-panel {
@@ -57,17 +55,26 @@
         .smooth-transition {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* Hide scrollbars but keep functionality */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        
+        /* شريط تمرير ذهبي مخصص فخم ومنسجم مع الهوية */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        ::-webkit-scrollbar-track {
+            background: #051619;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4af37;
+            border-radius: 10px;
+            border: 1px solid #051619;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f5d061;
         }
     </style>
 </head>
-<body class="min-h-screen flex overflow-hidden font-cairo">
+<body class="h-screen w-screen flex overflow-hidden font-cairo">
 
     <!-- نافذة التنبيهات المخصصة الصاعدة (Floating Toast Notifications) -->
     <div id="toast-container" class="fixed bottom-6 left-6 z-50 space-y-3 max-w-sm w-full"></div>
@@ -76,78 +83,80 @@
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden opacity-0 transition-opacity duration-300" onclick="toggleSidebar(false)"></div>
 
     <!-- ================= الـ SIDEBAR الجانبي المذهب ================= -->
-    <aside id="sidebar" class="fixed lg:static top-0 right-0 bottom-0 w-72 bg-shrine-dark border-l border-shrine-gold/20 z-40 transform translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col justify-between">
-        <div>
-            <!-- ترويسة اللوجو الفاخر -->
-            <div class="p-6 border-b border-shrine-gold/15 flex items-center gap-3">
-                <div class="relative w-12 h-12 rounded-full bg-gradient-to-br from-shrine-teal to-shrine-dark border-2 border-shrine-gold flex items-center justify-center shadow-lg">
-                    <!-- أيقونة قبة مذهبة متطورة -->
-                    <svg class="w-7 h-7 text-shrine-gold" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M50 15 L53 30 L65 30 L55 38 L58 53 L50 44 L42 53 L45 38 L35 30 L47 30 Z" fill="currentColor"/>
-                        <path d="M25 80 C25 60, 35 50, 50 50 C65 50, 75 60, 75 80 Z" stroke="currentColor" stroke-width="3" fill="none"/>
-                        <rect x="47" y="38" width="6" height="15" fill="currentColor"/>
-                        <line x1="15" y1="85" x2="85" y2="85" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-                    </svg>
+    <aside id="sidebar" class="fixed lg:static top-0 right-0 bottom-0 w-72 bg-shrine-dark border-l border-shrine-gold/20 z-40 transform translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col justify-between h-full shrink-0">
+        <div class="flex flex-col h-full justify-between">
+            <div>
+                <!-- ترويسة اللوجو الفاخر -->
+                <div class="p-6 border-b border-shrine-gold/15 flex items-center gap-3">
+                    <div class="relative w-12 h-12 rounded-full bg-gradient-to-br from-shrine-teal to-shrine-dark border-2 border-shrine-gold flex items-center justify-center shadow-lg">
+                        <!-- أيقونة قبة مذهبة متطورة -->
+                        <svg class="w-7 h-7 text-shrine-gold" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 15 L53 30 L65 30 L55 38 L58 53 L50 44 L42 53 L45 38 L35 30 L47 30 Z" fill="currentColor"/>
+                            <path d="M25 80 C25 60, 35 50, 50 50 C65 50, 75 60, 75 80 Z" stroke="currentColor" stroke-width="3" fill="none"/>
+                            <rect x="47" y="38" width="6" height="15" fill="currentColor"/>
+                            <line x1="15" y1="85" x2="85" y2="85" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-black text-shrine-gold tracking-wide">مركز السبطين الإداري</h1>
+                        <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                            خادم النظام متصل
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-sm font-black text-shrine-gold tracking-wide">مركز السبطين الإداري</h1>
-                    <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                        خادم النظام متصل
-                    </span>
-                </div>
+
+                <!-- روابط الملاحة المذهبة -->
+                <nav class="p-4 space-y-2">
+                    <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-shrine-gold text-shrine-dark transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+                        <span>الرئيسية والإحصائيات</span>
+                    </button>
+
+                    <button onclick="switchTab('products')" id="btn-tab-products" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-300 hover:bg-shrine-teal/30 hover:text-shrine-gold transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        <span>إدارة المنتجات</span>
+                        <span id="badge-products-count" class="mr-auto text-[10px] bg-shrine-gold/20 text-shrine-gold px-2 py-0.5 rounded-full font-bold">8</span>
+                    </button>
+
+                    <button onclick="switchTab('orders')" id="btn-tab-orders" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-300 hover:bg-shrine-teal/30 hover:text-shrine-gold transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                        <span>الطلبات الواردة</span>
+                        <span id="badge-orders-count" class="mr-auto text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full font-bold">4</span>
+                    </button>
+                </nav>
             </div>
 
-            <!-- روابط الملاحة المذهبة -->
-            <nav class="p-4 space-y-2">
-                <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-shrine-gold text-shrine-dark transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
-                    <span>الرئيسية والإحصائيات</span>
-                </button>
-
-                <button onclick="switchTab('products')" id="btn-tab-products" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-300 hover:bg-shrine-teal/30 hover:text-shrine-gold transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                    <span>إدارة المنتجات</span>
-                    <span id="badge-products-count" class="mr-auto text-[10px] bg-shrine-gold/20 text-shrine-gold px-2 py-0.5 rounded-full font-bold">8</span>
-                </button>
-
-                <button onclick="switchTab('orders')" id="btn-tab-orders" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-300 hover:bg-shrine-teal/30 hover:text-shrine-gold transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                    <span>الطلبات الواردة</span>
-                    <span id="badge-orders-count" class="mr-auto text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full font-bold">4</span>
-                </button>
-            </nav>
-        </div>
-
-        <!-- تذييل الجانب: تفعيل المحاكاة الحية والبروفايل -->
-        <div class="p-4 border-t border-shrine-gold/15 bg-shrine-deep/50 space-y-4">
-            <!-- كرت محاكاة الطلبات الحية السحري لربط المشاهد وإبهاره -->
-            <div class="p-3 bg-shrine-teal/20 rounded-xl border border-shrine-gold/30 text-center space-y-2">
-                <span class="block text-[11px] text-shrine-gold font-bold">💡 محاكاة ذكية للطلبات الحية</span>
-                <button onclick="toggleSimulation()" id="btn-simulation" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-lg transition shadow-md flex items-center justify-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
-                    <span>بدء المحاكاة الحية</span>
-                </button>
-            </div>
-
-            <!-- الملف التعريفي للمشرف -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-shrine-gold text-shrine-dark flex items-center justify-center font-black text-lg shadow-inner">
-                    ع
+            <!-- تذييل الجانب: تفعيل المحاكاة الحية والبروفايل -->
+            <div class="p-4 border-t border-shrine-gold/15 bg-shrine-deep/50 space-y-4">
+                <!-- كرت محاكاة الطلبات الحية السحري لربط المشاهد وإبهاره -->
+                <div class="p-3 bg-shrine-teal/20 rounded-xl border border-shrine-gold/30 text-center space-y-2">
+                    <span class="block text-[11px] text-shrine-gold font-bold">💡 محاكاة ذكية للطلبات الحية</span>
+                    <button onclick="toggleSimulation()" id="btn-simulation" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-lg transition shadow-md flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                        <span>بدء المحاكاة الحية</span>
+                    </button>
                 </div>
-                <div class="text-right">
-                    <p class="text-xs font-black text-white">المشرف علي رضا</p>
-                    <p class="text-[10px] text-gray-400">قسم الصيانة والإنتاج</p>
+
+                <!-- الملف التعريفي للمشرف -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-shrine-gold text-shrine-dark flex items-center justify-center font-black text-lg shadow-inner">
+                        ع
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-black text-white">المشرف علي رضا</p>
+                        <p class="text-[10px] text-gray-400">قسم الصيانة والإنتاج</p>
+                    </div>
                 </div>
             </div>
         </div>
     </aside>
 
     <!-- ================= القسم الرئيسي لمحتوى الصفحة ================= -->
-    <main class="flex-grow flex flex-col overflow-y-auto no-scrollbar">
+    <main class="flex-grow flex flex-col h-full overflow-y-auto overflow-x-hidden">
         
         <!-- الهيدر العلوي الذكي (Header) -->
-        <header class="bg-shrine-deep/60 backdrop-blur-md border-b border-shrine-gold/15 sticky top-0 z-20 px-6 py-4 flex items-center justify-between">
+        <header class="bg-shrine-deep/60 backdrop-blur-md border-b border-shrine-gold/15 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-4">
                 <!-- زر فتح الـ Sidebar على الموبايل -->
                 <button onclick="toggleSidebar(true)" class="lg:hidden p-2 text-shrine-gold hover:bg-shrine-teal/30 rounded-xl transition">
@@ -293,7 +302,7 @@
                     <button onclick="switchTab('orders')" class="text-xs text-shrine-gold hover:underline">عرض كل الطلبات ←</button>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
+                    <table class="w-full text-right text-xs min-w-[600px]">
                         <thead>
                             <tr class="text-gray-400 border-b border-shrine-gold/10">
                                 <th class="pb-2">رقم الحجز</th>
@@ -351,7 +360,7 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
+                    <table class="w-full text-right text-xs min-w-[900px]">
                         <thead>
                             <tr class="bg-shrine-dark/80 text-gray-300 border-b border-shrine-gold/10">
                                 <th class="p-4">المعرف</th>
@@ -966,7 +975,7 @@
                 const iraqiNames = ["حسن الفتلاوي", "أبو مرتضى الخفاجي", "ميثم الأسدي", "زهراء الكاظمي", "حسين الجبوري", "مقتدى الساعدي", "جعفر كمال"];
                 const iraqiProvinces = [
                     "كربلاء المقدسة، شارع السدرة", "بغداد، الكاظمية قرب الجوادين", "النجف الأشرف، شارع الرسول", 
-                    "البصرة، القرنة قرب شجرة آدم", "بابل، الحلة شارع الجمعية", "ذي قار، الناصرية حي أور"
+                    "البصرة، القرنة قرب شجرة آدم", "بابل, الحلة شارع الجمعية", "ذي قار، الناصرية حي أور"
                 ];
 
                 const randomProduct = products[Math.floor(Math.random() * products.length)];
