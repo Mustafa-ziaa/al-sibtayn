@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز السبطين للمبيعات - العتبة الحسينية المقدسة</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cairo for beautiful Arabic typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        shrine: {
+                            dark: '#0a2226',      /* الفيروزي الإسلامي الداكن جداً */
+                            teal: '#123e46',      /* الفيروزي الوسيط لشعار السبطين */
+                            lightTeal: '#1b5a65', /* فيروزي فاتح للتفاعل */
+                            gold: '#d4af37',      /* الذهبي الملكي للقباب والخطوط */
+                            goldHover: '#f3cd57', /* ذهبي متوهج */
+                            accent: '#10b981',    /* الأخضر الحسيني للبركة */
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0a2226;
+            color: #f3f4f6;
+            scrollbar-width: thin;
+            scrollbar-color: #d4af37 #0a2226;
+        }
+        /* Custom transitions */
+        .smooth-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Shine effect on gold elements */
+        .gold-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .gold-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 45%,
+                rgba(212, 175, 55, 0.3) 50%,
+                transparent 55%
+            );
+            transform: rotate(45deg);
+            transition: none;
+            opacity: 0;
+        }
+        .gold-shine:hover::after {
+            animation: shine 1.2s ease-in-out infinite;
+            opacity: 1;
+        }
+        @keyframes shine {
+            0% { left: -100%; top: -100%; }
+            100% { left: 100%; top: 100%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-shrine-gold selection:text-shrine-dark">
+
+    <!-- نافذة التنبيهات (Toast Notification) -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none smooth-transition">
+        <div class="bg-shrine-teal border-2 border-shrine-gold text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+            <span id="toast-icon" class="text-shrine-gold text-2xl">✨</span>
+            <p id="toast-message" class="font-semibold text-sm md:text-base"></p>
+        </div>
+    </div>
+
+    <!-- غطاء الخلفية عند فتح القوائم الجانبية -->
+    <div id="overlay" class="fixed inset-0 bg-black/60 z-40 hidden opacity-0 transition-opacity duration-300 pointer-events-none" onclick="toggleCart(false)"></div>
+
+    <!-- الشريط العلوي الإعلاني -->
+    <div class="bg-gradient-to-r from-shrine-dark via-shrine-teal to-shrine-dark border-b border-shrine-gold/30 text-xs md:text-sm py-2 px-4 text-center text-shrine-gold font-medium flex items-center justify-center gap-2">
+        <span>🕌 بركة العتبة الحسينية المقدسة - قسم الصيانة</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-shrine-gold animate-ping"></span>
+        <span>توصيل متوفر لجميع محافظات العراق الحبيبة</span>
+    </div>
+
+    <!-- الهيدر الرئيسي -->
+    <header class="sticky top-0 z-30 bg-shrine-dark/95 backdrop-blur-md border-b border-shrine-gold/20 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
+            
+            <!-- زر القائمة الجانبية للموبايل / معلومات التواصل -->
+            <div class="flex items-center gap-4">
+                <a href="tel:0785252226" class="hidden md:flex items-center gap-2 text-xs lg:text-sm text-gray-300 hover:text-shrine-gold transition">
+                    <svg class="w-5 h-5 text-shrine-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                    <span>واتساب / اتصال: 0785252226</span>
+                </a>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    مباشر الآن
+                </span>
+            </div>
+
+            <!-- الشعار والاسم (المركز) -->
+            <div class="flex items-center gap-3">
+                <div class="relative w-12 h-12 md:w-14 md:h-14 rounded-full bg-shrine-teal border-2 border-shrine-gold flex items-center justify-center shadow-inner overflow-hidden">
+                    <!-- تم رسم أيقونة مبسطة ومحترفة تشبه شعار العتبة (قبة ومنارة) -->
+                    <svg class="w-8 h-8 text-shrine-gold" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 15 L53 30 L65 30 L55 38 L58 53 L50 44 L42 53 L45 38 L35 30 L47 30 Z" fill="currentColor"/>
+                        <path d="M25 80 C25 60, 35 50, 50 50 C65 50, 75 60, 75 80 Z" stroke="currentColor" stroke-width="3" fill="none"/>
+                        <rect x="47" y="38" width="6" height="15" fill="currentColor"/>
+                        <line x1="15" y1="85" x2="85" y2="85" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="text-right">
+                    <h1 class="text-lg md:text-xl font-extrabold text-shrine-gold tracking-wide leading-tight">مركز السبطين للمبيعات</h1>
+                    <p class="text-[10px] md:text-xs text-gray-300 font-medium">العتبة الحسينية المقدسة - قسم الصيانة</p>
+                </div>
+            </div>
+
+            <!-- زر السلة التفاعلي -->
+            <button onclick="toggleCart(true)" class="relative p-2.5 md:p-3 rounded-xl bg-shrine-teal border border-shrine-gold/30 hover:border-shrine-gold hover:bg-shrine-lightTeal transition shadow-lg group">
+                <svg class="w-6 h-6 text-shrine-gold group-hover:scale-110 smooth-transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+                <!-- عداد السلة التفاعلي -->
+                <span id="cart-counter" class="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-full bg-red-600 border-2 border-shrine-dark text-white text-xs font-bold flex items-center justify-center opacity-0 scale-50 transition-all duration-300">0</span>
+            </button>
+
+        </div>
+    </header>
+
+    <!-- واجهة البطل (Hero Section) مع إحصائيات الحساب -->
+    <section class="relative bg-gradient-to-b from-shrine-teal/40 to-shrine-dark py-10 md:py-16 px-4 border-b border-shrine-gold/10 overflow-hidden">
+        <!-- زخارف خلفية إسلامية مبسطة -->
+        <div class="absolute inset-0 opacity-5 pointer-events-none flex items-center justify-center">
+            <svg class="w-[500px] h-[500px] text-shrine-gold" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L15.09 9.26L22 9.82L17 14.14L18.18 21L12 17.27L5.82 21L7 14.14L2 9.82L8.91 9.26L12 2Z"/>
+            </svg>
+        </div>
+
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <!-- إحصائيات تشبه لقطة التيك توك المرفقة لزيادة الواقعية والمصداقية -->
+            <div class="flex items-center justify-center gap-6 md:gap-12 mb-8 bg-shrine-teal/50 backdrop-blur border border-shrine-gold/20 p-4 rounded-2xl max-w-lg mx-auto shadow-2xl">
+                <div class="text-center">
+                    <span class="block text-lg md:text-xl font-bold text-shrine-gold">158.1K</span>
+                    <span class="text-xs text-gray-300">الإعجابات</span>
+                </div>
+                <div class="w-px h-10 bg-shrine-gold/25"></div>
+                <div class="text-center">
+                    <span class="block text-lg md:text-xl font-bold text-shrine-gold">8,908</span>
+                    <span class="text-xs text-gray-300">المتابعين</span>
+                </div>
+                <div class="w-px h-10 bg-shrine-gold/25"></div>
+                <div class="text-center">
+                    <span class="block text-lg md:text-xl font-bold text-shrine-gold">2</span>
+                    <span class="text-xs text-gray-300">أتابع</span>
+                </div>
+            </div>
+
+            <h2 class="text-2xl md:text-4xl font-extrabold mb-4 text-white">متجر الهدايا والبركات والملابس الرسمية</h2>
+            <p class="text-gray-300 text-sm md:text-base max-w-2xl mx-auto leading-relaxed mb-6">
+                نوفر لكم أرقى المنتجات الحسينية المصنعة بدقة وعناية داخل قسم الصيانة في العتبة الحسينية المقدسة. اقتنِ بركة مرقد الإمام الحسين (عليه السلام) أينما كنت.
+            </p>
+
+            <!-- زر التواصل المباشر السريع -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="https://wa.me/964785252226" target="_blank" class="px-6 py-3 rounded-xl bg-shrine-gold hover:bg-shrine-goldHover text-shrine-dark font-extrabold text-sm md:text-base shadow-lg hover:shadow-shrine-gold/20 transition flex items-center gap-2 gold-shine">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.588 1.971 14.11 1.053 11.5 1.053c-5.442 0-9.867 4.371-9.871 9.8.001 1.943.513 3.827 1.48 5.49L2.103 21.9l5.666-1.472c.002-.001.002-.001.003-.001z"/></svg>
+                    <span>مراسلتنا عبر واتساب</span>
+                </a>
+                <button onclick="scrollToProducts()" class="px-6 py-3 rounded-xl bg-shrine-teal border border-shrine-gold/40 text-shrine-gold hover:bg-shrine-lightTeal font-bold text-sm md:text-base transition">
+                    تصفح المنتجات المتوفرة
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفلترة والتصنيفات -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full" id="products-section">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+            <h3 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                <span class="w-3 h-6 bg-shrine-gold rounded-full"></span>
+                قائمة المعروضات الحالية
+            </h3>
+            
+            <!-- أزرار التصنيف التفاعلية -->
+            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+                <button onclick="filterCategory('all')" id="cat-all" class="category-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap border-2 border-shrine-gold bg-shrine-gold text-shrine-dark shadow-md transition">الكل</button>
+                <button onclick="filterCategory('apparel')" id="cat-apparel" class="category-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap border border-shrine-gold/30 bg-shrine-teal/30 text-gray-300 hover:border-shrine-gold hover:text-shrine-gold transition">الملابس والحسنيات</button>
+                <button onclick="filterCategory('gifts')" id="cat-gifts" class="category-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap border border-shrine-gold/30 bg-shrine-teal/30 text-gray-300 hover:border-shrine-gold hover:text-shrine-gold transition">الدروع والعلب الفاخرة</button>
+                <button onclick="filterCategory('accessories')" id="cat-accessories" class="category-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap border border-shrine-gold/30 bg-shrine-teal/30 text-gray-300 hover:border-shrine-gold hover:text-shrine-gold transition">الإكسسوارات والبركات</button>
+            </div>
+        </div>
+
+        <!-- شبكة عرض المنتجات (Products Grid) -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- سيتم توليد الكروت ديناميكياً عبر الجافا سكريبت لتسهيل التفاعل والسلة -->
+        </div>
+    </main>
+
+    <!-- نافذة تفاصيل المنتج (Product Details Modal) -->
+    <div id="details-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/80" onclick="closeDetailsModal()"></div>
+        <div class="bg-shrine-teal border-2 border-shrine-gold/60 rounded-2xl w-full max-w-lg overflow-hidden relative z-10 shadow-2xl transform scale-95 transition-all duration-300" id="details-content">
+            <!-- زر الإغلاق -->
+            <button onclick="closeDetailsModal()" class="absolute top-4 left-4 p-2 bg-shrine-dark/50 hover:bg-shrine-dark text-shrine-gold rounded-full transition z-10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- محتوى تفاصيل المنتج ديناميكي -->
+            <div id="details-inner-content"></div>
+        </div>
+    </div>
+
+    <!-- نافذة السلة الجانبية المنزلقة (Cart Drawer) -->
+    <aside id="cart-drawer" class="fixed top-0 left-0 bottom-0 w-full max-w-md bg-shrine-dark border-r border-shrine-gold/30 z-50 shadow-2xl transform -translate-x-full transition-transform duration-300 flex flex-col">
+        <!-- ترويسة السلة -->
+        <div class="p-4 border-b border-shrine-gold/20 flex items-center justify-between bg-shrine-teal/50">
+            <h4 class="text-lg font-extrabold text-shrine-gold flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                <span>سلة التسوق الخاصة بك</span>
+            </h4>
+            <button onclick="toggleCart(false)" class="p-2 text-gray-400 hover:text-shrine-gold transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- قائمة عناصر السلة -->
+        <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-4">
+            <!-- العناصر تضاف برمجياً -->
+        </div>
+
+        <!-- ملخص السعر والطلب -->
+        <div class="p-4 border-t border-shrine-gold/20 bg-shrine-teal/30 space-y-4">
+            <div class="flex items-center justify-between text-sm text-gray-300">
+                <span>المجموع الفرعي:</span>
+                <span id="cart-subtotal" class="font-bold text-white">0 د.ع</span>
+            </div>
+            <div class="flex items-center justify-between text-sm text-gray-300">
+                <span>توصيل لكافة المحافظات:</span>
+                <span class="text-shrine-gold font-bold">5,000 د.ع</span>
+            </div>
+            <div class="border-t border-dashed border-shrine-gold/20 pt-2 flex items-center justify-between text-base font-extrabold">
+                <span class="text-white">المجموع الكلي مع التوصيل:</span>
+                <span id="cart-total" class="text-shrine-gold text-lg">0 د.ع</span>
+            </div>
+
+            <!-- أزرار الإجراءات داخل السلة -->
+            <div class="grid grid-cols-1 gap-2 pt-2">
+                <button onclick="openCheckout()" id="checkout-btn" class="w-full py-3 bg-shrine-gold hover:bg-shrine-goldHover text-shrine-dark font-extrabold rounded-xl transition text-center shadow-lg gold-shine" disabled>
+                    تأكيد وإرسال الطلب الآن
+                </button>
+                <button onclick="clearCart()" class="w-full py-2 bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-semibold transition">
+                    تفريغ السلة بالكامل
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- نافذة إتمام الطلب (Checkout Modal) -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/80" onclick="closeCheckout()"></div>
+        <div class="bg-shrine-dark border-2 border-shrine-gold/80 rounded-2xl w-full max-w-lg overflow-hidden relative z-10 shadow-2xl transform scale-95 transition-all duration-300">
+            <!-- رأس النافذة -->
+            <div class="p-4 bg-shrine-teal border-b border-shrine-gold/20 flex items-center justify-between">
+                <h4 class="text-lg font-bold text-shrine-gold">إتمام حجز الطلبية</h4>
+                <button onclick="closeCheckout()" class="text-gray-400 hover:text-shrine-gold transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- استمارة معلومات المستلم -->
+            <form id="checkout-form" onsubmit="submitOrder(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5">الاسم الكامل للمستلم *</label>
+                    <input type="text" id="cust-name" required class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none transition text-sm" placeholder="اكتب اسمك الثلاثي الكامل">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5">رقم الهاتف العراقي النشط *</label>
+                    <input type="tel" id="cust-phone" required pattern="^07[3-9][0-9]{8}$" class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none transition text-sm text-left dir-ltr" placeholder="07XXXXXXXX">
+                    <span class="text-[10px] text-gray-400 mt-1 block">يجب أن يتكون من 11 رقم ويبدأ بـ 07 (آسيا سيل، زين، كورك)</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5">المحافظة *</label>
+                    <select id="cust-gov" required class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2.5 text-white focus:outline-none transition text-sm">
+                        <option value="" disabled selected class="bg-shrine-dark text-gray-400">اختر محافظتك</option>
+                        <option value="كربلاء المقدسة" class="bg-shrine-dark">كربلاء المقدسة</option>
+                        <option value="النجف الأشرف" class="bg-shrine-dark">النجف الأشرف</option>
+                        <option value="بغداد" class="bg-shrine-dark">بغداد</option>
+                        <option value="البصرة" class="bg-shrine-dark">البصرة</option>
+                        <option value="بابل" class="bg-shrine-dark">بابل</option>
+                        <option value="الديوانية" class="bg-shrine-dark">الديوانية</option>
+                        <option value="ذي قار" class="bg-shrine-dark">ذي قار</option>
+                        <option value="ميسان" class="bg-shrine-dark">ميسان</option>
+                        <option value="المثنى" class="bg-shrine-dark">المثنى</option>
+                        <option value="واسط" class="bg-shrine-dark">واسط</option>
+                        <option value="ديالى" class="bg-shrine-dark">ديالى</option>
+                        <option value="صلاح الدين" class="bg-shrine-dark">صلاح الدين</option>
+                        <option value="الأنبار" class="bg-shrine-dark">الأنبار</option>
+                        <option value="نينوى" class="bg-shrine-dark">نينوى</option>
+                        <option value="كركوك" class="bg-shrine-dark">كركوك</option>
+                        <option value="أربيل" class="bg-shrine-dark">أربيل</option>
+                        <option value="السليمانية" class="bg-shrine-dark">السليمانية</option>
+                        <option value="دهوك" class="bg-shrine-dark">دهوك</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5">العنوان بالتفصيل أو أقرب نقطة دالة *</label>
+                    <textarea id="cust-address" required rows="2" class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none transition text-sm" placeholder="مثال: حي الحسين، قرب جامع ..."></textarea>
+                </div>
+
+                <div class="p-3 bg-shrine-teal/30 border border-shrine-gold/20 rounded-xl flex items-start gap-2.5">
+                    <input type="checkbox" id="accept-terms" required class="mt-1 rounded border-shrine-gold/40 text-shrine-gold focus:ring-shrine-gold">
+                    <label for="accept-terms" class="text-xs text-gray-300 leading-relaxed">أؤكد صحة معلوماتي المدرجة وأتعهد باستلام شحنتي عند اتصال مندوب التوصيل.</label>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-shrine-gold hover:bg-shrine-goldHover text-shrine-dark font-extrabold rounded-xl transition shadow-lg text-center">
+                    إرسال الطلب وحفظ الفاتورة
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة نجاح الطلب وإصدار الفاتورة (Invoice Modal) -->
+    <div id="invoice-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/90"></div>
+        <div class="bg-white text-gray-800 rounded-2xl w-full max-w-lg overflow-hidden relative z-10 shadow-2xl p-6 border-4 border-shrine-gold">
+            <div class="text-center pb-4 border-b border-gray-200">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2 text-3xl">✓</div>
+                <h4 class="text-xl font-black text-shrine-teal">تم حجز طلبك بنجاح!</h4>
+                <p class="text-xs text-gray-500 mt-1">وصل طلبك إلى قسم مبيعات مركز السبطين</p>
+            </div>
+
+            <!-- تفاصيل الفاتورة -->
+            <div class="py-4 space-y-3 text-sm">
+                <div class="flex justify-between border-b pb-1.5"><span class="text-gray-500">رقم الطلب:</span><span id="inv-id" class="font-bold text-gray-800">#</span></div>
+                <div class="flex justify-between border-b pb-1.5"><span class="text-gray-500">اسم الزبون:</span><span id="inv-name" class="font-bold text-gray-800"></span></div>
+                <div class="flex justify-between border-b pb-1.5"><span class="text-gray-500">رقم الهاتف:</span><span id="inv-phone" class="font-bold text-gray-800"></span></div>
+                <div class="flex justify-between border-b pb-1.5"><span class="text-gray-500">موقع التوصيل:</span><span id="inv-location" class="font-bold text-gray-800"></span></div>
+                
+                <!-- تفاصيل المشتريات -->
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <p class="font-bold text-xs text-gray-700 mb-2 border-b pb-1">المنتجات المطلوبة:</p>
+                    <ul id="inv-items-list" class="space-y-1 text-xs text-gray-600">
+                        <!-- ديناميكي -->
+                    </ul>
+                </div>
+
+                <div class="flex justify-between pt-1 font-bold text-base text-shrine-teal">
+                    <span>المبلغ الكلي الواجب دفعه:</span>
+                    <span id="inv-total"></span>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 flex gap-2">
+                <button onclick="downloadOrShareInvoice()" class="flex-1 py-2.5 bg-shrine-teal hover:bg-shrine-lightTeal text-white font-bold rounded-xl text-xs transition">
+                    نسخ معلومات الطلب
+                </button>
+                <button onclick="closeInvoiceModal()" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">
+                    الرجوع للمتجر
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- فوتر الصفحة (Footer) -->
+    <footer class="bg-shrine-dark border-t border-shrine-gold/20 py-8 px-4 text-center text-xs md:text-sm text-gray-400 mt-auto">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-right">
+                <p class="font-bold text-shrine-gold text-base">مركز السبطين للمبيعات</p>
+                <p class="text-[11px] mt-0.5">قسم الصيانة والإنتاج بالأمانة العامة للعتبة الحسينية المقدسة</p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <a href="tel:0785252226" class="hover:text-shrine-gold transition">اتصل بنا: 0785252226</a>
+                <span>•</span>
+                <span>العراق، كربلاء المقدسة، شارع السدرة</span>
+            </div>
+
+            <div>
+                <p>© 2026 مركز السبطين. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- جافا سكريبت تفاعلية كاملة لإدارة المتجر والسلة والطلبات -->
+    <script>
+        // داتا المنتجات بناءً على ما في الصورة المرفقة
+        const products = [
+            {
+                id: 1,
+                name: "الثوب الحسيني الفاخر مع وشاح الولاء",
+                category: "apparel",
+                price: 45000,
+                rating: 4.9,
+                badge: "الأكثر طلباً",
+                hasSizes: true,
+                sizes: ["M", "L", "XL", "XXL"],
+                description: "دشداشة حسينية فاخرة ذات تفصيل مريح وراقي، تأتي مع الوشاح الحسيني المطرز باللون الأحمر الفاخر بعبارة العتبة الحسينية المقدسة.",
+                svgGraphic: `
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-amber-900" fill="currentColor">
+                        <rect x="35" y="30" width="30" height="60" rx="3"/>
+                        <path d="M25 35 L35 30 L35 50 L25 55 Z" />
+                        <path d="M75 35 L65 30 L65 50 L75 55 Z" />
+                        <!-- الوشاح الأحمر الموشى بالذهب -->
+                        <path d="M36 30 L45 30 L55 90 L46 90 Z" fill="#b91c1c" />
+                        <circle cx="48" cy="40" r="1.5" fill="#d4af37" />
+                        <circle cx="51" cy="60" r="1.5" fill="#d4af37" />
+                    </svg>
+                `
+            },
+            {
+                id: 2,
+                name: "علبة الهدايا والبركات الخشبية الكبرى",
+                category: "gifts",
+                price: 35000,
+                rating: 5.0,
+                badge: "بركة العتبة",
+                hasSizes: false,
+                description: "علبة خشبية سوداء فاخرة ببطانة مخملية حمراء ناعمة، منقوشة بالخط العربي المذهب ومطرزة بقطع من رخام أو قماش المرقد المطهر.",
+                svgGraphic: `
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-amber-950" fill="currentColor">
+                        <!-- علبة سوداء مع شريط أحمر وذهبي -->
+                        <rect x="25" y="30" width="50" height="45" rx="5" fill="#1e293b" stroke="#d4af37" stroke-width="2"/>
+                        <rect x="20" y="25" width="60" height="10" rx="2" fill="#0f172a" stroke="#d4af37" stroke-width="1.5"/>
+                        <!-- بطانة حمراء ظاهرة -->
+                        <rect x="27" y="37" width="46" height="3" fill="#b91c1c"/>
+                        <!-- نقش ذهبي في الوسط -->
+                        <circle cx="50" cy="53" r="8" fill="none" stroke="#d4af37" stroke-width="1.5"/>
+                        <path d="M47 53 Q50 49 53 53 Q50 57 47 53 Z" fill="#d4af37"/>
+                    </svg>
+                `
+            },
+            {
+                id: 3,
+                name: "سترة صيانة العتبة الحسينية الرسمية",
+                category: "apparel",
+                price: 55000,
+                rating: 4.8,
+                badge: "رسمي",
+                hasSizes: true,
+                sizes: ["M", "L", "XL", "XXL", "XXXL"],
+                description: "الزي الرسمي الأنيق والمقاوم والمطابق لسترات المهندسين وفنيي الصيانة التابعين للعتبة، يتضمن سترة وبنطال رمادي/أسود متناسق.",
+                svgGraphic: `
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-slate-700" fill="currentColor">
+                        <!-- السترة الرسمية مع الجيوب -->
+                        <path d="M30 25 L70 25 L75 75 L25 75 Z" fill="#334155"/>
+                        <path d="M30 25 L50 45 L70 25 Z" fill="#1e293b"/>
+                        <!-- شعار صيانة العتبة على الصدر -->
+                        <circle cx="38" cy="35" r="2.5" fill="#d4af37"/>
+                        <!-- جيوب السترة -->
+                        <rect x="32" y="55" width="12" height="12" rx="1" fill="#1e293b"/>
+                        <rect x="56" y="55" width="12" height="12" rx="1" fill="#1e293b"/>
+                    </svg>
+                `
+            },
+            {
+                id: 4,
+                name: "سوار البركة الأخضر المنسوج (يا مهدي)",
+                category: "accessories",
+                price: 5000,
+                rating: 4.9,
+                badge: "مستحب",
+                hasSizes: false,
+                description: "سوار بركة منسوج يدوياً بخيوط صوفية خضراء مباركة من داخل الحرم الشريف، يحتوي على لوحة فضية صغيرة منقوشة باسم الإمام المهدي (عج).",
+                svgGraphic: `
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-emerald-600" fill="none" stroke="currentColor" stroke-width="4">
+                        <!-- سوار أخضر منسوج -->
+                        <ellipse cx="50" cy="50" rx="35" ry="15" />
+                        <ellipse cx="50" cy="58" rx="30" ry="12" stroke-dasharray="4 4" />
+                        <!-- اللوحة -->
+                        <rect x="40" y="42" width="20" height="12" rx="2" fill="#e2e8f0" stroke="#d4af37" stroke-width="1.5" />
+                        <path d="M44 48 Q50 45 56 48" stroke="#123e46" stroke-width="1" />
+                    </svg>
+                `
+            },
+            {
+                id: 5,
+                name: "درع زجاجي تذكاري فاخر بمخطوطة 'علي'",
+                category: "gifts",
+                price: 25000,
+                rating: 5.0,
+                badge: "تحفة نادرة",
+                hasSizes: false,
+                description: "درع مصنوع من الأكريليك والزجاج المقاوم عالي النقاوة، يجسد مخطوطة يدوية دقيقة ومحفورة بالليزر لاسم أمير المؤمنين علي (عليه السلام) بماء الذهب.",
+                svgGraphic: `
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-cyan-200" fill="none" stroke="currentColor" stroke-width="2">
+                        <!-- الدرع الزجاجي الشفاف والقاعدة -->
+                        <path d="M35 15 L65 15 L75 75 L25 75 Z" fill="rgba(186, 230, 253, 0.2)" stroke="#bae6fd" stroke-width="1.5"/>
+                        <rect x="20" y="75" width="60" height="8" rx="2" fill="#d4af37"/>
+                        <!-- مخطوطة بالداخل -->
+                        <path d="M43 35 Q50 25 57 35 T50 60 Q43 45 43 35 Z" fill="#123e46" stroke="#d4af37" stroke-width="1.5"/>
+                    </svg>
+                `
+            },
+            {
+                id: 6,
+                name: "مسبحة استغفار إلكترونية ذكية مطورة",
+                category: "accessories",
+                price: 7000,
+                rating: 4.7,
+                badge: "عملي جداً",
+                hasSizes: false,
+                description: "عداد تسبيح رقمي مع شاشة ذكية وإضاءة ليلية، مغلفة بغلاف جلدي أزرق داكن مقاوم للتعرق وحزام مريح للإصبع.",
+                svgGraphic: `
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-blue-900" fill="currentColor">
+                        <!-- المسبحة الإلكترونية -->
+                        <rect x="35" y="25" width="30" height="50" rx="10" stroke="#d4af37" stroke-width="2"/>
+                        <!-- شاشة العداد -->
+                        <rect x="40" y="32" width="20" height="10" rx="2" fill="#cbd5e1" stroke="#000" stroke-width="1"/>
+                        <text x="50" y="40" font-size="7" font-weight="bold" fill="#000" text-anchor="middle">0128</text>
+                        <!-- زر التسبيح الكبير -->
+                        <circle cx="50" cy="54" r="7" fill="#d4af37" stroke="#1e3a8a" stroke-width="1"/>
+                        <!-- زر التصفير الصغير -->
+                        <circle cx="50" cy="66" r="2.5" fill="#ef4444"/>
+                    </svg>
+                `
+            },
+            {
+                id: 7,
+                name: "قميص العمل الميداني الصيفي (قسم الصيانة)",
+                category: "apparel",
+                price: 20000,
+                rating: 4.8,
+                badge: "مريح",
+                hasSizes: true,
+                sizes: ["M", "L", "XL", "XXL"],
+                description: "قميص عمل تكتيكي مريح جداً مصنوع من ألياف القطن والكتان الطبيعي، مناسب للأجواء الحارة ويحمل ألوان قسم الصيانة وهيبته.",
+                svgGraphic: `
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-teal-800" fill="currentColor">
+                        <path d="M30 25 L70 25 L73 75 L27 75 Z" fill="#115e59"/>
+                        <!-- ياقة باللون الذهبي الباهت -->
+                        <path d="M35 25 L50 35 L65 25 L50 20 Z" fill="#ccfbf1"/>
+                        <!-- جيب أمامي -->
+                        <rect x="54" y="38" width="10" height="12" rx="1" fill="#0f766e"/>
+                    </svg>
+                `
+            },
+            {
+                id: 8,
+                name: "ميدالية العتبة الذهبية في علبة مخمل حمراء",
+                category: "gifts",
+                price: 15000,
+                rating: 5.0,
+                badge: "هدية رائعة",
+                hasSizes: false,
+                description: "ميدالية معدنية ثقيلة مطلية بالذهب اللامع، تحمل نقوش قبة العتبة الحسينية وساعة الحرم الشهيرة، مقدمة داخل علبة مخملية حمراء فاخرة.",
+                svgGraphic: `
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-red-700" fill="currentColor">
+                        <!-- العلبة المفتوحة -->
+                        <rect x="25" y="25" width="50" height="50" rx="4" fill="#991b1b" stroke="#d4af37" stroke-width="1.5"/>
+                        <!-- الميدالية بداخلها -->
+                        <circle cx="50" cy="50" r="15" fill="#eab308" stroke="#d4af37" stroke-width="2"/>
+                        <!-- شريط التثبيت -->
+                        <rect x="47" y="35" width="6" height="5" fill="#1e3a8a"/>
+                    </svg>
+                `
+            }
+        ];
+
+        let cart = [];
+
+        // تشغيل التهيئة عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            renderProducts(products);
+            updateCartUI();
+        });
+
+        // طباعة المنتجات على الشبكة
+        function renderProducts(productsList) {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+
+            if (productsList.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-400">
+                        <p class="text-lg">عذراً، لم يتم العثور على أي منتج في هذا القسم حالياً.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            productsList.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "bg-shrine-teal/40 border border-shrine-gold/20 hover:border-shrine-gold/80 rounded-2xl p-4 flex flex-col justify-between smooth-transition hover:translate-y-[-4px] hover:shadow-2xl hover:shadow-shrine-gold/10 group";
+                
+                card.innerHTML = `
+                    <div class="relative">
+                        <!-- شارة مميزة للمنتج -->
+                        ${product.badge ? `
+                            <span class="absolute top-2 right-2 bg-shrine-gold text-shrine-dark text-[10px] font-black px-2.5 py-1 rounded-full z-10 shadow-md">
+                                ${product.badge}
+                            </span>
+                        ` : ''}
+                        
+                        <!-- صندوق صورة جرافيك فني بديل عن الصور المفقودة -->
+                        <div class="w-full h-48 bg-gradient-to-br from-shrine-dark via-shrine-teal to-shrine-lightTeal rounded-xl flex items-center justify-center p-6 border border-shrine-gold/10 overflow-hidden relative">
+                            <!-- لمسة شعاع خلفي دافئ -->
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.15)_0%,transparent_70%)]"></div>
+                            <div class="w-28 h-28 transform group-hover:scale-110 smooth-transition filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)]">
+                                ${product.svgGraphic}
+                            </div>
+                        </div>
+
+                        <!-- الاسم والتقييم -->
+                        <div class="mt-4 flex items-start justify-between gap-2">
+                            <h4 class="font-bold text-sm md:text-base text-white group-hover:text-shrine-gold smooth-transition line-clamp-2 min-h-[2.5rem] md:min-h-[3rem]">
+                                ${product.name}
+                            </h4>
+                            <div class="flex items-center gap-1 bg-shrine-dark/80 px-2 py-0.5 rounded-lg text-shrine-gold text-xs border border-shrine-gold/20">
+                                <span>★</span>
+                                <span class="font-bold">${product.rating}</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-gray-300 line-clamp-2 mt-1 leading-relaxed">
+                            ${product.description}
+                        </p>
+                    </div>
+
+                    <!-- السعر وإجراءات الحجز والسلة -->
+                    <div class="mt-4 pt-3 border-t border-shrine-gold/10">
+                        <div class="flex items-baseline justify-between mb-3">
+                            <span class="text-xs text-gray-400">السعر الخاص:</span>
+                            <span class="text-base md:text-lg font-black text-shrine-gold">
+                                ${product.price.toLocaleString()} <span class="text-xs font-normal text-gray-300">د.ع</span>
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="viewProductDetails(${product.id})" class="py-2.5 rounded-xl border border-shrine-gold/40 text-shrine-gold hover:bg-shrine-teal/60 text-xs font-bold transition">
+                                تفاصيل أكثر
+                            </button>
+                            <button onclick="directAddToCart(${product.id})" class="py-2.5 rounded-xl bg-shrine-gold hover:bg-shrine-goldHover text-shrine-dark font-extrabold text-xs transition flex items-center justify-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                <span>إضافة</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // فلترة التصنيفات
+        function filterCategory(category) {
+            // تحديث تصميم الأزرار النشطة
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => {
+                btn.className = "category-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap border border-shrine-gold/30 bg-shrine-teal/30 text-gray-300 hover:border-shrine-gold hover:text-shrine-gold transition";
+            });
+
+            const activeBtn = document.getElementById(`cat-${category}`);
+            if (activeBtn) {
+                activeBtn.className = "category-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap border-2 border-shrine-gold bg-shrine-gold text-shrine-dark shadow-md transition";
+            }
+
+            // تصفية وعرض المنتجات
+            if (category === 'all') {
+                renderProducts(products);
+            } else {
+                const filtered = products.filter(p => p.category === category);
+                renderProducts(filtered);
+            }
+        }
+
+        // التمرير إلى قسم المنتجات
+        function scrollToProducts() {
+            document.getElementById('products-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // إظهار التنبيه التفاعلي الجميل
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMessage.textContent = message;
+            toastIcon.textContent = isSuccess ? "✨" : "⚠️";
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        // فتح وإغلاق السلة الجانبية
+        function toggleCart(isOpen) {
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('overlay');
+
+            if (isOpen) {
+                drawer.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden', 'opacity-0');
+                overlay.classList.add('block', 'opacity-100');
+            } else {
+                drawer.classList.add('-translate-x-full');
+                overlay.classList.remove('opacity-100');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // إضافة سريعة ومباشرة إلى السلة (دون اختيار قياس)
+        function directAddToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const selectedSize = product.hasSizes ? product.sizes[0] : null;
+            addToCartLogic(product, selectedSize);
+        }
+
+        // منطق الإضافة الموحد
+        function addToCartLogic(product, size) {
+            // التحقق من وجود العنصر مسبقاً بنفس القياس
+            const existingIndex = cart.findIndex(item => item.product.id === product.id && item.selectedSize === size);
+
+            if (existingIndex > -1) {
+                cart[existingIndex].quantity += 1;
+            } else {
+                cart.push({
+                    product: product,
+                    selectedSize: size,
+                    quantity: 1
+                });
+            }
+
+            updateCartUI();
+            showToast(`تمت إضافة "${product.name}" إلى سلتك`);
+        }
+
+        // تحديث واجهة السلة والعداد والأسعار
+        function updateCartUI() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const counter = document.getElementById('cart-counter');
+            const subtotalEl = document.getElementById('cart-subtotal');
+            const totalEl = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            cartItemsContainer.innerHTML = '';
+
+            let subtotal = 0;
+            let totalItems = 0;
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16 text-gray-400 text-center">
+                        <svg class="w-16 h-16 text-shrine-gold/40 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                        <p class="text-sm font-semibold">سلة المشتريات فارغة تماماً</p>
+                        <p class="text-xs text-gray-500 mt-1">ابدأ بإضافة المنتجات المباركة من المتجر</p>
+                    </div>
+                `;
+                checkoutBtn.disabled = true;
+                checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                counter.classList.add('opacity-0', 'scale-50');
+            } else {
+                checkoutBtn.disabled = false;
+                checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                cart.forEach((item, index) => {
+                    const itemTotal = item.product.price * item.quantity;
+                    subtotal += itemTotal;
+                    totalItems += item.quantity;
+
+                    const cartItemRow = document.createElement('div');
+                    cartItemRow.className = "flex items-center gap-3 bg-shrine-teal/20 p-3 rounded-xl border border-shrine-gold/10 relative overflow-hidden";
+                    cartItemRow.innerHTML = `
+                        <!-- صورة مصغرة للمنتج -->
+                        <div class="w-12 h-12 rounded-lg bg-shrine-dark flex items-center justify-center p-1.5 shrink-0 border border-shrine-gold/15">
+                            ${item.product.svgGraphic}
+                        </div>
+
+                        <!-- معلومات المنتج والقياس والتحكم -->
+                        <div class="flex-grow">
+                            <h5 class="text-xs font-bold text-white line-clamp-1">${item.product.name}</h5>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[11px] text-shrine-gold font-bold">${item.product.price.toLocaleString()} د.ع</span>
+                                ${item.selectedSize ? `
+                                    <span class="text-[10px] bg-shrine-gold/20 text-shrine-gold px-1.5 py-0.5 rounded font-black">
+                                        قياس: ${item.selectedSize}
+                                    </span>
+                                ` : ''}
+                            </div>
+
+                            <!-- أزرار زيادة ونقصان الكمية -->
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="adjustQuantity(${index}, -1)" class="w-6 h-6 rounded bg-shrine-dark hover:bg-shrine-lightTeal flex items-center justify-center text-shrine-gold text-xs transition font-extrabold">-</button>
+                                <span class="text-xs font-bold text-white">${item.quantity}</span>
+                                <button onclick="adjustQuantity(${index}, 1)" class="w-6 h-6 rounded bg-shrine-dark hover:bg-shrine-lightTeal flex items-center justify-center text-shrine-gold text-xs transition font-extrabold">+</button>
+                            </div>
+                        </div>
+
+                        <!-- حذف وزر الحذف -->
+                        <button onclick="removeCartItem(${index})" class="absolute top-2 left-2 text-red-400 hover:text-red-500 transition p-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    `;
+                    cartItemsContainer.appendChild(cartItemRow);
+                });
+
+                // تحديث عداد السلة التفاعلي
+                counter.textContent = totalItems;
+                counter.classList.remove('opacity-0', 'scale-50');
+                counter.classList.add('opacity-100', 'scale-100');
+            }
+
+            subtotalEl.textContent = `${subtotal.toLocaleString()} د.ع`;
+            
+            // حساب الشحن الثابت لكافة المحافظات بـ 5,000 دينار عراقي
+            const deliveryFee = cart.length > 0 ? 5000 : 0;
+            totalEl.textContent = `${(subtotal + deliveryFee).toLocaleString()} د.ع`;
+        }
+
+        // تعديل الكميات
+        function adjustQuantity(index, delta) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartUI();
+        }
+
+        // حذف منتج من السلة
+        function removeCartItem(index) {
+            const name = cart[index].product.name;
+            cart.splice(index, 1);
+            updateCartUI();
+            showToast(`تم إزالة "${name}" من السلة`, false);
+        }
+
+        // مسح السلة بالكامل
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+            showToast("تم تفريغ سلة المشتريات بالكامل", false);
+        }
+
+        // فتح ومعاينة تفاصيل المنتج في نافذة منبثقة
+        function viewProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const modal = document.getElementById('details-modal');
+            const inner = document.getElementById('details-inner-content');
+            const content = document.getElementById('details-content');
+
+            inner.innerHTML = `
+                <!-- جرافيك المنتج في النافذة -->
+                <div class="h-64 bg-gradient-to-br from-shrine-dark via-shrine-teal to-shrine-lightTeal flex items-center justify-center p-8 relative">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.2)_0%,transparent_75%)]"></div>
+                    <div class="w-36 h-36 filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]">
+                        ${product.svgGraphic}
+                    </div>
+                </div>
+
+                <!-- معلومات المنتج -->
+                <div class="p-6 space-y-4">
+                    <div class="flex items-start justify-between gap-4">
+                        <h4 class="text-lg md:text-xl font-black text-shrine-gold">${product.name}</h4>
+                        <span class="text-xl font-extrabold text-white shrink-0">${product.price.toLocaleString()} د.ع</span>
+                    </div>
+
+                    <p class="text-sm text-gray-200 leading-relaxed">
+                        ${product.description}
+                    </p>
+
+                    <!-- خيار القياسات للملابس -->
+                    ${product.hasSizes ? `
+                        <div class="space-y-2">
+                            <span class="block text-xs font-bold text-gray-300">القياسات المتوفرة:</span>
+                            <div class="flex flex-wrap gap-2" id="modal-size-selector">
+                                ${product.sizes.map((sz, idx) => `
+                                    <button onclick="selectSizeBtn(this, '${sz}')" class="size-btn px-4 py-2 rounded-xl border ${idx === 0 ? 'border-shrine-gold bg-shrine-gold text-shrine-dark' : 'border-shrine-gold/30 text-gray-300'} text-xs font-bold transition">
+                                        ${sz}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- المجموع والإجراء -->
+                    <div class="pt-4 border-t border-shrine-gold/20 flex gap-3">
+                        <button onclick="modalAddToCart(${product.id})" class="flex-grow py-3 bg-shrine-gold hover:bg-shrine-goldHover text-shrine-dark font-extrabold rounded-xl transition text-center shadow-lg gold-shine">
+                            إضافة إلى السلة
+                        </button>
+                        <button onclick="closeDetailsModal()" class="px-5 py-3 rounded-xl bg-shrine-dark hover:bg-shrine-teal/50 text-gray-300 text-xs font-bold transition">
+                            إغلاق المعاينة
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // حفظ القياس المحدد افتراضياً
+            window.modalSelectedSize = product.hasSizes ? product.sizes[0] : null;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 50);
+        }
+
+        // اختيار القياس في المنبثقة
+        function selectSizeBtn(btnElement, size) {
+            const btns = document.querySelectorAll('.size-btn');
+            btns.forEach(btn => {
+                btn.className = "size-btn px-4 py-2 rounded-xl border border-shrine-gold/30 text-gray-300 text-xs font-bold transition";
+            });
+            btnElement.className = "size-btn px-4 py-2 rounded-xl border border-shrine-gold bg-shrine-gold text-shrine-dark text-xs font-bold transition";
+            window.modalSelectedSize = size;
+        }
+
+        // إضافة المنتج من النافذة المنبثقة
+        function modalAddToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            addToCartLogic(product, window.modalSelectedSize);
+            closeDetailsModal();
+        }
+
+        // إغلاق المنبثقة
+        function closeDetailsModal() {
+            const modal = document.getElementById('details-modal');
+            const content = document.getElementById('details-content');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 150);
+        }
+
+        // فتح نافذة إتمام الحجز
+        function openCheckout() {
+            if (cart.length === 0) return;
+            toggleCart(false);
+
+            const modal = document.getElementById('checkout-modal');
+            modal.classList.remove('hidden');
+        }
+
+        // إغلاق نافذة إتمام الحجز
+        function closeCheckout() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+        // معالجة وإرسال الحجز (موكاب نهائي للفاتورة)
+        function submitOrder(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const gov = document.getElementById('cust-gov').value;
+            const address = document.getElementById('cust-address').value;
+
+            // توليد معرف عشوائي للطلب
+            const orderId = "SBT-" + Math.floor(Math.random() * 90000 + 10000);
+
+            // ملء بيانات الفاتورة
+            document.getElementById('inv-id').textContent = orderId;
+            document.getElementById('inv-name').textContent = name;
+            document.getElementById('inv-phone').textContent = phone;
+            document.getElementById('inv-location').textContent = `${gov}، ${address}`;
+
+            // جرد وتلخيص المشتريات
+            const listContainer = document.getElementById('inv-items-list');
+            listContainer.innerHTML = '';
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.product.price * item.quantity;
+                subtotal += itemTotal;
+
+                const li = document.createElement('li');
+                li.className = "flex justify-between";
+                li.innerHTML = `
+                    <span>• ${item.product.name} ${item.selectedSize ? `(قياس ${item.selectedSize})` : ''} × ${item.quantity}</span>
+                    <span class="font-bold text-gray-700">${itemTotal.toLocaleString()} د.ع</span>
+                `;
+                listContainer.appendChild(li);
+            });
+
+            // المجموع الكلي مع إضافة 5 آلاف للتوصيل
+            const grandTotal = subtotal + 5000;
+            document.getElementById('inv-total').textContent = `${grandTotal.toLocaleString()} د.ع`;
+
+            // إخلاق نافذة الحجز وفتح الفاتورة
+            closeCheckout();
+            document.getElementById('invoice-modal').classList.remove('hidden');
+        }
+
+        // نسخ ولصق بيانات الطلب الفورية
+        function downloadOrShareInvoice() {
+            const orderId = document.getElementById('inv-id').textContent;
+            const name = document.getElementById('inv-name').textContent;
+            const phone = document.getElementById('inv-phone').textContent;
+            const location = document.getElementById('inv-location').textContent;
+            const total = document.getElementById('inv-total').textContent;
+
+            const textToCopy = `
+=== طلبية جديدة من مركز السبطين ===
+رقم الطلبية: ${orderId}
+الاسم: ${name}
+رقم الهاتف: ${phone}
+العنوان: ${location}
+المجموع النهائي شامل التوصيل: ${total}
+بانتظار تأكيد المسؤول للشحن الفوري.
+===============================
+            `.trim();
+
+            // طريقة النسخ المتوافقة مع الإطار الفرعي (iFrame)
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showToast("تم نسخ تفاصيل الطلبية بنجاح! يمكنك إرسالها للشركة أو حفظها");
+        }
+
+        // إغلاق الفاتورة وتصفير السلة للعودة للتسوق
+        function closeInvoiceModal() {
+            document.getElementById('invoice-modal').classList.add('hidden');
+            cart = [];
+            updateCartUI();
+            document.getElementById('checkout-form').reset();
+        }
+    </script>
+</body>
+</html>
