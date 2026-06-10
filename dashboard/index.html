@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم مركز السبطين - الإدارة العامة</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN for stunning visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        shrine: {
+                            dark: '#051619',      /* أعمق درجات الفيروزي الزيتي */
+                            deep: '#0a2226',      /* فيروزي داكن للبطاقات */
+                            teal: '#123e46',      /* اللون الأساسي لهوية السبطين */
+                            lightTeal: '#1c5d69', /* للتفاعلات والـ Hover */
+                            gold: '#d4af37',      /* ذهبي ملكي نقي للحدود والنصوص */
+                            goldHover: '#f5d061', /* ذهبي متوهج */
+                            success: '#10b981',   /* أخضر إسلامي مشع */
+                            danger: '#ef4444'     /* أحمر للإنذارات والحذف */
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #051619;
+            color: #f3f4f6;
+            scrollbar-width: thin;
+            scrollbar-color: #d4af37 #051619;
+        }
+        /* Custom dynamic background glow */
+        .glass-panel {
+            background: rgba(10, 34, 38, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .gold-border-glow:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+        }
+        .smooth-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex overflow-hidden font-cairo">
+
+    <!-- نافذة التنبيهات المخصصة الصاعدة (Floating Toast Notifications) -->
+    <div id="toast-container" class="fixed bottom-6 left-6 z-50 space-y-3 max-w-sm w-full"></div>
+
+    <!-- غطاء الموبايل الخلفي للـ Sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden opacity-0 transition-opacity duration-300" onclick="toggleSidebar(false)"></div>
+
+    <!-- ================= الـ SIDEBAR الجانبي المذهب ================= -->
+    <aside id="sidebar" class="fixed lg:static top-0 right-0 bottom-0 w-72 bg-shrine-dark border-l border-shrine-gold/20 z-40 transform translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col justify-between">
+        <div>
+            <!-- ترويسة اللوجو الفاخر -->
+            <div class="p-6 border-b border-shrine-gold/15 flex items-center gap-3">
+                <div class="relative w-12 h-12 rounded-full bg-gradient-to-br from-shrine-teal to-shrine-dark border-2 border-shrine-gold flex items-center justify-center shadow-lg">
+                    <!-- أيقونة قبة مذهبة متطورة -->
+                    <svg class="w-7 h-7 text-shrine-gold" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 15 L53 30 L65 30 L55 38 L58 53 L50 44 L42 53 L45 38 L35 30 L47 30 Z" fill="currentColor"/>
+                        <path d="M25 80 C25 60, 35 50, 50 50 C65 50, 75 60, 75 80 Z" stroke="currentColor" stroke-width="3" fill="none"/>
+                        <rect x="47" y="38" width="6" height="15" fill="currentColor"/>
+                        <line x1="15" y1="85" x2="85" y2="85" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-black text-shrine-gold tracking-wide">مركز السبطين الإداري</h1>
+                    <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                        خادم النظام متصل
+                    </span>
+                </div>
+            </div>
+
+            <!-- روابط الملاحة المذهبة -->
+            <nav class="p-4 space-y-2">
+                <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-shrine-gold text-shrine-dark transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+                    <span>الرئيسية والإحصائيات</span>
+                </button>
+
+                <button onclick="switchTab('products')" id="btn-tab-products" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-300 hover:bg-shrine-teal/30 hover:text-shrine-gold transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    <span>إدارة المنتجات</span>
+                    <span id="badge-products-count" class="mr-auto text-[10px] bg-shrine-gold/20 text-shrine-gold px-2 py-0.5 rounded-full font-bold">8</span>
+                </button>
+
+                <button onclick="switchTab('orders')" id="btn-tab-orders" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-300 hover:bg-shrine-teal/30 hover:text-shrine-gold transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                    <span>الطلبات الواردة</span>
+                    <span id="badge-orders-count" class="mr-auto text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full font-bold">4</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- تذييل الجانب: تفعيل المحاكاة الحية والبروفايل -->
+        <div class="p-4 border-t border-shrine-gold/15 bg-shrine-deep/50 space-y-4">
+            <!-- كرت محاكاة الطلبات الحية السحري لربط المشاهد وإبهاره -->
+            <div class="p-3 bg-shrine-teal/20 rounded-xl border border-shrine-gold/30 text-center space-y-2">
+                <span class="block text-[11px] text-shrine-gold font-bold">💡 محاكاة ذكية للطلبات الحية</span>
+                <button onclick="toggleSimulation()" id="btn-simulation" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-lg transition shadow-md flex items-center justify-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                    <span>بدء المحاكاة الحية</span>
+                </button>
+            </div>
+
+            <!-- الملف التعريفي للمشرف -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-shrine-gold text-shrine-dark flex items-center justify-center font-black text-lg shadow-inner">
+                    ع
+                </div>
+                <div class="text-right">
+                    <p class="text-xs font-black text-white">المشرف علي رضا</p>
+                    <p class="text-[10px] text-gray-400">قسم الصيانة والإنتاج</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= القسم الرئيسي لمحتوى الصفحة ================= -->
+    <main class="flex-grow flex flex-col overflow-y-auto no-scrollbar">
+        
+        <!-- الهيدر العلوي الذكي (Header) -->
+        <header class="bg-shrine-deep/60 backdrop-blur-md border-b border-shrine-gold/15 sticky top-0 z-20 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <!-- زر فتح الـ Sidebar على الموبايل -->
+                <button onclick="toggleSidebar(true)" class="lg:hidden p-2 text-shrine-gold hover:bg-shrine-teal/30 rounded-xl transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <div class="hidden md:block">
+                    <h2 class="text-lg font-black text-white flex items-center gap-2">
+                        <span>أهلاً بك مجدداً في نظام السبطين الإداري</span>
+                        <span class="text-lg">🌿</span>
+                    </h2>
+                    <p class="text-[11px] text-gray-400">آخر تحديث للبيانات والطلبات: اليوم، <span id="current-time-str">11:57 م</span></p>
+                </div>
+            </div>
+
+            <!-- أدوات التحكم السريعة والإشعارات -->
+            <div class="flex items-center gap-3">
+                <!-- جرس الإشعارات التفاعلي ومحتواه المنسدل -->
+                <div class="relative">
+                    <button onclick="toggleNotificationDropdown()" class="p-2.5 rounded-xl bg-shrine-teal/40 hover:bg-shrine-teal text-shrine-gold border border-shrine-gold/25 smooth-transition relative group">
+                        <svg class="w-5 h-5 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <span id="notif-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-bounce">2</span>
+                    </button>
+                    <!-- قائمة الإشعارات المنسدلة -->
+                    <div id="notif-dropdown" class="absolute left-0 mt-3 w-80 bg-shrine-dark border border-shrine-gold/30 rounded-2xl shadow-2xl hidden overflow-hidden z-30">
+                        <div class="p-3 bg-shrine-teal border-b border-shrine-gold/20 flex items-center justify-between">
+                            <span class="text-xs font-bold text-shrine-gold">آخر الإشعارات الحية</span>
+                            <button onclick="clearNotifications()" class="text-[10px] text-gray-300 hover:text-white underline">مسح الكل</button>
+                        </div>
+                        <div id="notif-list" class="max-h-64 overflow-y-auto divide-y divide-shrine-gold/10">
+                            <!-- إشعارات افتراضية -->
+                            <div class="p-3 text-xs hover:bg-shrine-teal/20 transition">
+                                <p class="text-white font-semibold">طلب شراء جديد معلق</p>
+                                <p class="text-gray-400 text-[10px] mt-0.5">الزبون حسن محمد - كربلاء المقدسة</p>
+                            </div>
+                            <div class="p-3 text-xs hover:bg-shrine-teal/20 transition">
+                                <p class="text-white font-semibold">تعديل أسعار الملابس بنجاح</p>
+                                <p class="text-gray-400 text-[10px] mt-0.5">قبل 10 دقائق من قبل المشرف</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- زر عرض المتجر (موكاب العودة) -->
+                <a href="index.html" class="px-4 py-2 rounded-xl bg-shrine-teal/40 hover:bg-shrine-teal text-shrine-gold border border-shrine-gold/30 text-xs font-bold transition flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <span>معاينة المتجر للعامة</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- ================= تبويب الرئيسية والإحصائيات ================= -->
+        <div id="tab-dashboard" class="tab-content p-6 space-y-6">
+            
+            <!-- شبكة الإحصائيات الفائقة (Stats Grid) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <div class="glass-panel gold-border-glow p-5 rounded-2xl smooth-transition relative overflow-hidden group">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-shrine-gold/5 rounded-full filter blur-xl group-hover:bg-shrine-gold/10 transition"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400 font-bold">إجمالي المبيعات (د.ع)</span>
+                        <div class="p-2 rounded-lg bg-shrine-gold/10 text-shrine-gold">
+                            💰
+                        </div>
+                    </div>
+                    <p id="stat-sales" class="text-xl md:text-2xl font-black text-white mt-4">221,000</p>
+                    <span class="text-[10px] text-emerald-400 mt-1 block">📈 +12% مبيعات منذ الأمس</span>
+                </div>
+
+                <div class="glass-panel gold-border-glow p-5 rounded-2xl smooth-transition relative overflow-hidden group">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-red-500/5 rounded-full filter blur-xl group-hover:bg-red-500/10 transition"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400 font-bold">الطلبات المعلقة</span>
+                        <div class="p-2 rounded-lg bg-red-500/10 text-red-400">
+                            ⏳
+                        </div>
+                    </div>
+                    <p id="stat-pending" class="text-xl md:text-2xl font-black text-white mt-4">4</p>
+                    <span class="text-[10px] text-amber-400 mt-1 block">🔔 بانتظار موافقتك للشحن</span>
+                </div>
+
+                <div class="glass-panel gold-border-glow p-5 rounded-2xl smooth-transition relative overflow-hidden group">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/5 rounded-full filter blur-xl group-hover:bg-emerald-500/10 transition"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400 font-bold">المنتجات النشطة بالمتجر</span>
+                        <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                            📦
+                        </div>
+                    </div>
+                    <p id="stat-products" class="text-xl md:text-2xl font-black text-white mt-4">8</p>
+                    <span class="text-[10px] text-gray-400 mt-1 block">مقسمة على 3 تصنيفات أساسية</span>
+                </div>
+
+                <div class="glass-panel gold-border-glow p-5 rounded-2xl smooth-transition relative overflow-hidden group">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-blue-500/5 rounded-full filter blur-xl group-hover:bg-blue-500/10 transition"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400 font-bold">زوار الموقع الفعليين</span>
+                        <div class="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+                            👥
+                        </div>
+                    </div>
+                    <p id="stat-visitors" class="text-xl md:text-2xl font-black text-white mt-4">1,849</p>
+                    <span class="text-[10px] text-emerald-400 mt-1 block">🟢 24 متصفح نشط الآن</span>
+                </div>
+
+            </div>
+
+            <!-- قسم الرسوم البيانية الاستثنائية (Charts Section) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- مخطط الأرباح والمبيعات -->
+                <div class="glass-panel p-6 rounded-2xl lg:col-span-2 space-y-4">
+                    <div class="flex items-center justify-between border-b border-shrine-gold/15 pb-3">
+                        <h3 class="text-sm font-black text-white flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-shrine-gold animate-pulse"></span>
+                            <span>أداء وحجم المبيعات الأسبوعية (د.ع)</span>
+                        </h3>
+                        <span class="text-[10px] bg-shrine-teal text-shrine-gold px-2 py-1 rounded-lg">محدث تلقائياً</span>
+                    </div>
+                    <div class="relative h-64 md:h-72">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- مخطط توزيع المنتجات في السلة والمخزون -->
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between border-b border-shrine-gold/15 pb-3">
+                        <h3 class="text-sm font-black text-white flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span>توزيع المنتجات حسب التصنيف</span>
+                        </h3>
+                    </div>
+                    <div class="relative h-64 md:h-72 flex items-center justify-center">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- جدول الطلبات المختصر السريع بالرئيسية -->
+            <div class="glass-panel p-6 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-shrine-gold/15 pb-3">
+                    <h3 class="text-sm font-black text-white flex items-center gap-2">
+                        <span>آخر الطلبات المعلقة الواردة للتو</span>
+                    </h3>
+                    <button onclick="switchTab('orders')" class="text-xs text-shrine-gold hover:underline">عرض كل الطلبات ←</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-shrine-gold/10">
+                                <th class="pb-2">رقم الحجز</th>
+                                <th class="pb-2">اسم الزبون</th>
+                                <th class="pb-2">الموقع</th>
+                                <th class="pb-2">الهاتف</th>
+                                <th class="pb-2">المبلغ مع التوصيل</th>
+                                <th class="pb-2">الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-orders-table" class="divide-y divide-shrine-gold/5">
+                            <!-- يملأ ديناميكياً -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= تبويب إدارة المنتجات (CRUD) ================= -->
+        <div id="tab-products" class="tab-content p-6 space-y-6 hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-shrine-gold/20 pb-4">
+                <div>
+                    <h3 class="text-lg font-black text-white">إدارة وضبط المنتجات المعروضة</h3>
+                    <p class="text-xs text-gray-400">يمكنك هنا إضافة هدايا حسينية جديدة أو تعديل وحذف العناصر المتاحة للزبائن.</p>
+                </div>
+                <button onclick="openProductModal()" class="px-5 py-2.5 rounded-xl bg-shrine-gold hover:bg-shrine-goldHover text-shrine-dark font-black text-xs md:text-sm transition flex items-center justify-center gap-1.5 shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span>إضافة منتج حسيني جديد</span>
+                </button>
+            </div>
+
+            <!-- شبكة عرض المنتجات قابلة للتعديل والمسح -->
+            <div id="admin-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <!-- ديناميكي -->
+            </div>
+        </div>
+
+        <!-- ================= تبويب الطلبات الواردة ================= -->
+        <div id="tab-orders" class="tab-content p-6 space-y-6 hidden">
+            <div class="border-b border-shrine-gold/20 pb-4">
+                <h3 class="text-lg font-black text-white">جميع الطلبات المحجوزة والمباشرة</h3>
+                <p class="text-xs text-gray-400">تابع حركة الطلبيات الواردة من زوار ومحبي العتبة المقدسة، وقم بتحديث الحالات للتوصيل.</p>
+            </div>
+
+            <div class="glass-panel rounded-2xl overflow-hidden border border-shrine-gold/15">
+                <div class="p-4 bg-shrine-teal/30 border-b border-shrine-gold/15 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <span class="font-bold text-shrine-gold">سجل طلبات العراق الموحد</span>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                        <span class="text-gray-300">قيد المراجعة</span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-green-500 ml-2"></span>
+                        <span class="text-gray-300">تم الشحن والاتصال</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead>
+                            <tr class="bg-shrine-dark/80 text-gray-300 border-b border-shrine-gold/10">
+                                <th class="p-4">المعرف</th>
+                                <th class="p-4">الزبون والمستلم</th>
+                                <th class="p-4">رقم الهاتف العراقي</th>
+                                <th class="p-4">الموقع بالتفصيل</th>
+                                <th class="p-4">المنتج والتفصيل</th>
+                                <th class="p-4">المبلغ شامل التوصيل</th>
+                                <th class="p-4">الحالة</th>
+                                <th class="p-4 text-center">الإجراء والتحكم</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-full-table" class="divide-y divide-shrine-gold/5">
+                            <!-- ديناميكي -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ================= نافذة إضافة / تعديل منتج (Product Modal) ================= -->
+    <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <!-- الغطاء المعتم الخلفي -->
+        <div class="absolute inset-0 bg-black/80" onclick="closeProductModal()"></div>
+        <div class="bg-shrine-dark border-2 border-shrine-gold rounded-2xl w-full max-w-lg overflow-hidden relative z-10 shadow-2xl transform scale-95 transition-all duration-300" id="product-modal-box">
+            
+            <div class="p-4 bg-shrine-teal border-b border-shrine-gold/20 flex items-center justify-between">
+                <h4 id="modal-title" class="text-base font-black text-shrine-gold">إضافة منتج جديد</h4>
+                <button onclick="closeProductModal()" class="text-gray-400 hover:text-shrine-gold transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form id="product-form" onsubmit="saveProduct(event)" class="p-6 space-y-4 text-xs md:text-sm">
+                <!-- إدخال خفي للمعرف عند التعديل -->
+                <input type="hidden" id="form-product-id">
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1">اسم المنتج العتباتي الفاخر *</label>
+                    <input type="text" id="form-name" required class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none transition text-xs" placeholder="مثال: مسبحة استغفار فاخرة">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">السعر (د.ع) *</label>
+                        <input type="number" id="form-price" required class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2.5 text-white focus:outline-none transition text-xs" placeholder="15000">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">القسم والتصنيف *</label>
+                        <select id="form-category" required class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2.5 text-white focus:outline-none transition text-xs">
+                            <option value="apparel">الملابس والحسنيات</option>
+                            <option value="gifts">الدروع والعلب الفاخرة</option>
+                            <option value="accessories">الإكسسوارات والبركات</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">التقييم الافتراضي</label>
+                        <input type="number" step="0.1" max="5" min="1" id="form-rating" class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2.5 text-white focus:outline-none transition text-xs" value="5.0">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">شارة متميزة (اختياري)</label>
+                        <input type="text" id="form-badge" class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2.5 text-white focus:outline-none transition text-xs" placeholder="جديد، بركة، الأكثر طلباً">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1">وصف موجز للمنتج ومواصفاته *</label>
+                    <textarea id="form-description" required rows="3" class="w-full bg-shrine-teal/40 border border-shrine-gold/20 focus:border-shrine-gold rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none transition text-xs" placeholder="اكتب تفاصيل ومقاسات المنتج المتاح..."></textarea>
+                </div>
+
+                <div class="pt-4 border-t border-shrine-gold/20 flex gap-2">
+                    <button type="submit" class="flex-grow py-3 bg-shrine-gold hover:bg-shrine-goldHover text-shrine-dark font-extrabold rounded-xl transition text-center text-xs">
+                        حفظ البيانات وتحديث المعروضات
+                    </button>
+                    <button type="button" onclick="closeProductModal()" class="px-5 py-3 bg-shrine-teal/60 hover:bg-shrine-teal text-gray-300 rounded-xl transition text-xs">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- جافا سكريبت تفاعلية كاملة مع إدارة CRUD وحوسبة الرسوم البيانية ومحاكاة الطلبات الحية -->
+    <script>
+        // داتا المنتجات الافتراضية
+        let products = [
+            { id: 1, name: "الثوب الحسيني الفاخر مع وشاح الولاء", category: "apparel", price: 45000, rating: 4.9, badge: "الأكثر طلباً", description: "دشداشة حسينية فاخرة ذات تفصيل مريح وراقي، تأتي مع الوشاح الحسيني المطرز باللون الأحمر الفاخر بعبارة العتبة الحسينية المقدسة.", iconCode: "👔" },
+            { id: 2, name: "علبة الهدايا والبركات الخشبية الكبرى", category: "gifts", price: 35000, rating: 5.0, badge: "بركة العتبة", description: "علبة خشبية سوداء فاخرة ببطانة مخملية حمراء ناعمة، منقوشة بالخط العربي المذهب ومطرزة بقطع من رخام أو قماش المرقد المطهر.", iconCode: "🎁" },
+            { id: 3, name: "سترة صيانة العتبة الحسينية الرسمية", category: "apparel", price: 55000, rating: 4.8, badge: "رسمي", description: "الزي الرسمي الأنيق والمقاوم والمطابق لسترات المهندسين وفنيي الصيانة التابعين للعتبة، يتضمن سترة وبنطال رمادي/أسود متناسق.", iconCode: "🧥" },
+            { id: 4, name: "سوار البركة الأخضر المنسوج (يا مهدي)", category: "accessories", price: 5000, rating: 4.9, badge: "مستحب", description: "سوار بركة منسوج يدوياً بخيوط صوفية خضراء مباركة من داخل الحرم الشريف، يحتوي على لوحة فضية صغيرة منقوشة باسم الإمام المهدي (عج).", iconCode: "📿" },
+            { id: 5, name: "درع زجاجي تذكاري فاخر بمخطوطة 'علي'", category: "gifts", price: 25000, rating: 5.0, badge: "تحفة نادرة", description: "درع مصنوع من الأكريليك والزجاج المقاوم عالي النقاوة، يجسد مخطوطة يدوية دقيقة ومحفورة بالليزر لاسم أمير المؤمنين علي (عليه السلام) بماء الذهب.", iconCode: "🏺" },
+            { id: 6, name: "مسبحة استغفار إلكترونية ذكية مطورة", category: "accessories", price: 7000, rating: 4.7, badge: "عملي جداً", description: "عداد تسبيح رقمي مع شاشة ذكية وإضاءة ليلية، مغلفة بغلاف جلدي أزرق داكن مقاوم للتعرق وحزام مريح للإصبع.", iconCode: "⌚" },
+            { id: 7, name: "قميص العمل الميداني الصيفي (قسم الصيانة)", category: "apparel", price: 20000, rating: 4.8, badge: "مريح", description: "قميص عمل تكتيكي مريح جداً مصنوع من ألياف القطن والكتان الطبيعي، مناسب للأجواء الحارة ويحمل ألوان قسم الصيانة وهيبته.", iconCode: "👕" },
+            { id: 8, name: "ميدالية العتبة الذهبية في علبة مخمل حمراء", category: "gifts", price: 15000, rating: 5.0, badge: "هدية رائعة", description: "ميدالية معدنية ثقيلة مطلية بالذهب اللامع، تحمل نقوش قبة العتبة الحسينية وساعة الحرم الشهيرة، مقدمة داخل علبة مخملية حمراء فاخرة.", iconCode: "🏅" }
+        ];
+
+        // داتا الطلبات الافتراضية
+        let orders = [
+            { id: "SBT-10493", clientName: "أبو علي الكربلائي", phone: "07801234567", location: "كربلاء المقدسة، قرب باب قبلة الإمام الحسين", product: "الثوب الحسيني الفاخر مع وشاح الولاء", amount: 50000, status: "pending" },
+            { id: "SBT-39420", clientName: "د. منتظر النجفي", phone: "07709876543", location: "النجف الأشرف، حي السعد", product: "درع زجاجي تذكاري فاخر بمخطوطة 'علي'", amount: 30000, status: "pending" },
+            { id: "SBT-22019", clientName: "الحاج جاسم الواسطي", phone: "07505556677", location: "واسط، الكوت، قرب السدة", product: "علبة الهدايا والبركات الخشبية الكبرى", amount: 40000, status: "pending" },
+            { id: "SBT-88491", clientName: "سجاد البصراوي", phone: "07855522261", location: "البصرة، العشار، شارع الوطن", product: "مسبحة استغفار إلكترونية ذكية مطورة", amount: 12000, status: "shipped" }
+        ];
+
+        // مبيعات عشوائية موزعة على الأيام لإعطاء طابع حقيقي للرسم البياني
+        let weeklySales = [45000, 80000, 35000, 110000, 55000, 95000, 221000];
+
+        // محاكاة الطلبات الحية
+        let simulationInterval = null;
+        let isSimulationRunning = false;
+
+        // المتغيرات العالمية للـ Charts
+        let salesChart = null;
+        let categoryChart = null;
+
+        // عند تحميل المستند بالكامل
+        window.onload = function () {
+            // تحديث الوقت الافتراضي بالهيدر
+            const now = new Date();
+            document.getElementById('current-time-str').textContent = now.toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' });
+
+            // بناء الإحصائيات
+            calculateStats();
+            // بناء جدول الرئيسية والطلبات والمنتجات
+            renderDashboardOrdersTable();
+            renderAllOrdersTable();
+            renderAdminProducts();
+
+            // تفعيل الرسومات البيانية
+            initSalesChart();
+            initCategoryChart();
+        };
+
+        // تبديل الألسن والتبويبات
+        function switchTab(tabId) {
+            // إخفاء كل التبويبات
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // إظهار التبويب المطلوب
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // تحديث الـ Sidebar
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.className = "nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-300 hover:bg-shrine-teal/30 hover:text-shrine-gold transition";
+            });
+
+            const activeBtn = document.getElementById(`btn-tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = "nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-shrine-gold text-shrine-dark transition";
+            }
+
+            // إغلاق Sidebar الموبايل تلقائياً
+            toggleSidebar(false);
+        }
+
+        // إغلاق وفتح الـ Sidebar الجانبي للهواتف
+        function toggleSidebar(isOpen) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (isOpen) {
+                sidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 50);
+            } else {
+                sidebar.classList.add('translate-x-full');
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        // إظهار تنبيه Toast مخصص رائع
+        function triggerToast(title, message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colorClass = type === 'success' ? 'border-emerald-500 bg-shrine-deep text-emerald-400' : 'border-red-500 bg-shrine-deep text-red-400';
+            const icon = type === 'success' ? '✨' : '🚨';
+
+            toast.className = `p-4 rounded-xl border-2 shadow-2xl flex items-start gap-3 smooth-transition translate-x-12 opacity-0 ${colorClass}`;
+            toast.innerHTML = `
+                <span class="text-xl shrink-0">${icon}</span>
+                <div class="text-right">
+                    <p class="font-extrabold text-xs text-white">${title}</p>
+                    <p class="text-[11px] text-gray-300 mt-0.5">${message}</p>
+                </div>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-x-12', 'opacity-0');
+            }, 100);
+
+            // حذف التنبيه تلقائياً بعد 4 ثوانٍ
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // فتح وإغلاق جرس الإشعارات
+        function toggleNotificationDropdown() {
+            const notifDropdown = document.getElementById('notif-dropdown');
+            notifDropdown.classList.toggle('hidden');
+        }
+
+        function clearNotifications() {
+            document.getElementById('notif-list').innerHTML = `
+                <div class="p-6 text-center text-xs text-gray-400">لا توجد إشعارات حالياً</div>
+            `;
+            document.getElementById('notif-badge').classList.add('hidden');
+        }
+
+        // مسح وحساب الإحصائيات العامة
+        function calculateStats() {
+            // إجمالي المبيعات
+            let totalAmount = 0;
+            orders.forEach(o => {
+                if (o.status !== 'cancelled') totalAmount += o.amount;
+            });
+            document.getElementById('stat-sales').textContent = totalAmount.toLocaleString() + " د.ع";
+
+            // معلقة
+            const pending = orders.filter(o => o.status === 'pending').length;
+            document.getElementById('stat-pending').textContent = pending;
+            document.getElementById('badge-orders-count').textContent = pending;
+
+            // إجمالي المنتجات
+            const totalProducts = products.length;
+            document.getElementById('stat-products').textContent = totalProducts;
+            document.getElementById('badge-products-count').textContent = totalProducts;
+        }
+
+        // بناء جدول الطلبات المختصر (Dashboard Main Home)
+        function renderDashboardOrdersTable() {
+            const tbody = document.getElementById('dashboard-orders-table');
+            tbody.innerHTML = '';
+
+            const pendingOrders = orders.filter(o => o.status === 'pending');
+            if (pendingOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-gray-400 text-[11px]">لا توجد طلبات معلقة بانتظارك حالياً.</td></tr>`;
+                return;
+            }
+
+            pendingOrders.forEach(o => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-shrine-teal/10 transition";
+                tr.innerHTML = `
+                    <td class="py-3 font-bold text-shrine-gold">${o.id}</td>
+                    <td class="py-3 text-white font-semibold">${o.clientName}</td>
+                    <td class="py-3 text-gray-300">${o.location.split('،')[0]}</td>
+                    <td class="py-3 font-semibold text-gray-300">${o.phone}</td>
+                    <td class="py-3 text-white font-bold">${o.amount.toLocaleString()} د.ع</td>
+                    <td class="py-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20">قيد المراجعة</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // بناء جدول إدارة الطلبات بالكامل (كامل التفاصيل)
+        function renderAllOrdersTable() {
+            const tbody = document.getElementById('orders-full-table');
+            tbody.innerHTML = '';
+
+            orders.forEach(o => {
+                let statusBadge = "";
+                let actionBtn = "";
+
+                if (o.status === 'pending') {
+                    statusBadge = `<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">⏳ قيد المراجعة</span>`;
+                    actionBtn = `
+                        <button onclick="updateOrderStatus('${o.id}', 'shipped')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition mr-1">موافقة وشحن</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'cancelled')" class="px-3 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition">إلغاء الحجز</button>
+                    `;
+                } else if (o.status === 'shipped') {
+                    statusBadge = `<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">✓ تم الشحن بنجاح</span>`;
+                    actionBtn = `<span class="text-gray-400 text-[10px]">الطلب مكتمل وتم التصدير</span>`;
+                } else {
+                    statusBadge = `<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/30">✕ ملغى</span>`;
+                    actionBtn = `<button onclick="updateOrderStatus('${o.id}', 'pending')" class="px-3 py-1 bg-shrine-teal/40 hover:bg-shrine-teal text-shrine-gold rounded-lg transition">إعادة فتح</button>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-shrine-teal/10 transition";
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-shrine-gold">${o.id}</td>
+                    <td class="p-4 text-white font-black">${o.clientName}</td>
+                    <td class="p-4 text-gray-300 font-semibold text-left dir-ltr">${o.phone}</td>
+                    <td class="p-4 text-gray-400">${o.location}</td>
+                    <td class="p-4 text-white font-semibold">${o.product}</td>
+                    <td class="p-4 font-black text-shrine-gold">${o.amount.toLocaleString()} د.ع</td>
+                    <td class="p-4">${statusBadge}</td>
+                    <td class="p-4 text-center space-x-1">${actionBtn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // تحديث حالة الطلبات
+        function updateOrderStatus(orderId, newStatus) {
+            const index = orders.findIndex(o => o.id === orderId);
+            if (index > -1) {
+                orders[index].status = newStatus;
+                
+                // تحديث مبيعات الأسبوع إذا تحول الطلب للشحن
+                if (newStatus === 'shipped') {
+                    weeklySales[6] += orders[index].amount;
+                    triggerToast("تم تأكيد الطلبية", `تم تجهيز الشحنة وجاري إرسالها للعميل ${orders[index].clientName}`, 'success');
+                } else if (newStatus === 'cancelled') {
+                    triggerToast("إلغاء حجز", `تم إلغاء طلب الزبون ${orders[index].clientName} بنجاح`, 'error');
+                } else {
+                    triggerToast("تحديث الطلبية", `أعيد الطلب ${orderId} لقائمة الانتظار`, 'success');
+                }
+
+                // تحديث الشارت والإحصائيات
+                calculateStats();
+                renderDashboardOrdersTable();
+                renderAllOrdersTable();
+                updateCharts();
+            }
+        }
+
+        // بناء وعرض بطاقات المنتجات لإدارتها
+        function renderAdminProducts() {
+            const grid = document.getElementById('admin-products-grid');
+            grid.innerHTML = '';
+
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "glass-panel p-4 rounded-xl border border-shrine-gold/20 flex flex-col justify-between hover:border-shrine-gold/80 transition relative";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] bg-shrine-teal text-shrine-gold px-2 py-0.5 rounded-full font-bold">${p.category === 'apparel' ? 'ملابس وحسينيات' : p.category === 'gifts' ? 'هدايا ودروع' : 'إكسسوارات مسبحة'}</span>
+                            <span class="text-xl">${p.iconCode || '🎁'}</span>
+                        </div>
+                        <h4 class="font-bold text-xs text-white mt-3 line-clamp-1">${p.name}</h4>
+                        <p class="text-[10px] text-gray-400 line-clamp-2 mt-1 min-h-[2rem]">${p.description}</p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-shrine-gold/10">
+                        <div class="flex items-baseline justify-between mb-3">
+                            <span class="text-[10px] text-gray-400">السعر الحالي:</span>
+                            <span class="text-sm font-bold text-shrine-gold">${p.price.toLocaleString()} د.ع</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="editProduct(${p.id})" class="py-1.5 rounded-lg border border-shrine-gold/30 text-shrine-gold hover:bg-shrine-teal/40 text-[11px] font-bold transition">
+                                تعديل
+                            </button>
+                            <button onclick="deleteProduct(${p.id})" class="py-1.5 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/20 text-[11px] font-bold transition">
+                                حذف
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // حذف منتج
+        function deleteProduct(productId) {
+            const productIndex = products.findIndex(p => p.id === productId);
+            if (productIndex > -1) {
+                const name = products[productIndex].name;
+                
+                // تنفيذ حذف آمن ومطور بدون alert
+                products.splice(productIndex, 1);
+                
+                // التنبيه وتحديث الشاشات
+                triggerToast("تم حذف المنتج", `تم شطب "${name}" من قائمة المنتجات المتاحة بنجاح`, 'error');
+                calculateStats();
+                renderAdminProducts();
+                updateCharts();
+            }
+        }
+
+        // فتح نافذة إعداد وحفظ المنتج
+        function openProductModal() {
+            document.getElementById('product-form').reset();
+            document.getElementById('form-product-id').value = '';
+            document.getElementById('modal-title').textContent = "إضافة منتج حسيني جديد المعروض للجمهور";
+            
+            const modal = document.getElementById('product-modal');
+            const modalBox = document.getElementById('product-modal-box');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalBox.classList.remove('scale-95');
+                modalBox.classList.add('scale-100');
+            }, 50);
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('product-modal');
+            const modalBox = document.getElementById('product-modal-box');
+            modalBox.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 150);
+        }
+
+        // جلب بيانات المنتج المراد تعديله للمودال
+        function editProduct(productId) {
+            const p = products.find(prod => prod.id === productId);
+            if (!p) return;
+
+            document.getElementById('form-product-id').value = p.id;
+            document.getElementById('form-name').value = p.name;
+            document.getElementById('form-price').value = p.price;
+            document.getElementById('form-category').value = p.category;
+            document.getElementById('form-rating').value = p.rating;
+            document.getElementById('form-badge').value = p.badge || '';
+            document.getElementById('form-description').value = p.description;
+
+            document.getElementById('modal-title').textContent = "تعديل وحفظ بيانات المنتج: " + p.name;
+            
+            // فتح المودال
+            const modal = document.getElementById('product-modal');
+            const modalBox = document.getElementById('product-modal-box');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalBox.classList.remove('scale-95');
+                modalBox.classList.add('scale-100');
+            }, 50);
+        }
+
+        // حفظ / تعديل المنتج
+        function saveProduct(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('form-product-id').value;
+            const name = document.getElementById('form-name').value;
+            const price = parseFloat(document.getElementById('form-price').value);
+            const category = document.getElementById('form-category').value;
+            const rating = parseFloat(document.getElementById('form-rating').value) || 5.0;
+            const badge = document.getElementById('form-badge').value;
+            const description = document.getElementById('form-description').value;
+
+            if (id) {
+                // تعديل
+                const index = products.findIndex(p => p.id === parseInt(id));
+                if (index > -1) {
+                    products[index].name = name;
+                    products[index].price = price;
+                    products[index].category = category;
+                    products[index].rating = rating;
+                    products[index].badge = badge;
+                    products[index].description = description;
+
+                    triggerToast("تم تحديث المنتج", `تمت مزامنة وحفظ التعديلات للمنتج "${name}"`, 'success');
+                }
+            } else {
+                // إضافة جديد
+                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+                products.push({
+                    id: newId,
+                    name: name,
+                    price: price,
+                    category: category,
+                    rating: rating,
+                    badge: badge,
+                    description: description,
+                    iconCode: category === 'apparel' ? '👔' : category === 'gifts' ? '🎁' : '📿'
+                });
+
+                triggerToast("إضافة منتج ناجحة", `تـم إدراج "${name}" في صفحة المبيعات بنجاح`, 'success');
+            }
+
+            // إغلاق وتحديث
+            closeProductModal();
+            calculateStats();
+            renderAdminProducts();
+            updateCharts();
+        }
+
+
+        // ================= تفعيل وبناء الرسوم البيانية (Charts) =================
+
+        function initSalesChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['الجمعة', 'السبت', 'الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'اليوم'],
+                    datasets: [{
+                        label: 'معدل الأرباح والمبيعات باليوم (د.ع)',
+                        data: weeklySales,
+                        borderColor: '#d4af37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#d4af37',
+                        pointHoverRadius: 8,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#9ca3af', font: { family: 'Cairo' } },
+                            grid: { color: 'rgba(212, 175, 55, 0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#9ca3af', font: { family: 'Cairo' } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initCategoryChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            // حساب تكرار الأقسام من المنتجات
+            const categoriesCount = getCategoryCounts();
+
+            categoryChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['الملابس والحسنيات', 'الدروع والعلب الفاخرة', 'الإكسسوارات والبركات'],
+                    datasets: [{
+                        data: [categoriesCount.apparel, categoriesCount.gifts, categoriesCount.accessories],
+                        backgroundColor: ['#1c5d69', '#d4af37', '#10b981'],
+                        borderWidth: 2,
+                        borderColor: '#0a2226'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#f3f4f6',
+                                font: { family: 'Cairo', size: 10 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // دالة مساعدة لعد المنتجات بالأقسام لـ Doughnut Chart
+        function getCategoryCounts() {
+            const counts = { apparel: 0, gifts: 0, accessories: 0 };
+            products.forEach(p => {
+                if (counts[p.category] !== undefined) counts[p.category]++;
+            });
+            return counts;
+        }
+
+        // تحديث حي لجميع الرسوم البيانية عند أي CRUD
+        function updateCharts() {
+            if (salesChart) {
+                salesChart.data.datasets[0].data = weeklySales;
+                salesChart.update();
+            }
+            if (categoryChart) {
+                const counts = getCategoryCounts();
+                categoryChart.data.datasets[0].data = [counts.apparel, counts.gifts, counts.accessories];
+                categoryChart.update();
+            }
+        }
+
+
+        // ================= محاكاة الطلبات الحية التفاعلية الساحرة =================
+
+        function toggleSimulation() {
+            const btn = document.getElementById('btn-simulation');
+            
+            if (isSimulationRunning) {
+                // إيقاف
+                clearInterval(simulationInterval);
+                isSimulationRunning = false;
+                btn.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                    <span>بدء المحاكاة الحية</span>
+                `;
+                btn.className = "w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-lg transition shadow-md flex items-center justify-center gap-2";
+                triggerToast("توقف محاكاة الطلبات", "تم إنهاء توليد الطلبات الوهمية بنجاح.", 'error');
+            } else {
+                // تشغيل
+                isSimulationRunning = true;
+                btn.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                    <span>جارٍ المحاكاة... إيقاف</span>
+                `;
+                btn.className = "w-full py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs rounded-lg transition shadow-md flex items-center justify-center gap-2";
+                triggerToast("انطلاق المحاكاة الحية", "سيبدأ النظام باستقبال طلبات وهمية من كافة أنحاء العراق كل بضع ثوانٍ!", 'success');
+
+                // تشغيل محاكي مستمر
+                simulateIncomingOrders();
+            }
+        }
+
+        function simulateIncomingOrders() {
+            // توليد طلب عشوائي كل 5 إلى 9 ثوانٍ
+            simulationInterval = setInterval(() => {
+                const iraqiNames = ["حسن الفتلاوي", "أبو مرتضى الخفاجي", "ميثم الأسدي", "زهراء الكاظمي", "حسين الجبوري", "مقتدى الساعدي", "جعفر كمال"];
+                const iraqiProvinces = [
+                    "كربلاء المقدسة، شارع السدرة", "بغداد، الكاظمية قرب الجوادين", "النجف الأشرف، شارع الرسول", 
+                    "البصرة، القرنة قرب شجرة آدم", "بابل، الحلة شارع الجمعية", "ذي قار، الناصرية حي أور"
+                ];
+
+                const randomProduct = products[Math.floor(Math.random() * products.length)];
+                const randomName = iraqiNames[Math.floor(Math.random() * iraqiNames.length)];
+                const randomProvince = iraqiProvinces[Math.floor(Math.random() * iraqiProvinces.length)];
+                const randomId = "SBT-" + Math.floor(Math.random() * 90000 + 10000);
+                const randomPhone = "07" + Math.floor(Math.random() * 3 + 7) + Math.floor(10000000 + Math.random() * 90000000);
+
+                // إنشاء الطلب الجديد
+                const newOrder = {
+                    id: randomId,
+                    clientName: randomName,
+                    phone: randomPhone,
+                    location: randomProvince,
+                    product: randomProduct.name,
+                    amount: randomProduct.price + 5000, // مضافاً له التوصيل
+                    status: "pending"
+                };
+
+                // إضافة الطلب للسلة
+                orders.unshift(newOrder);
+
+                // زيادة الإحصائيات والأرباح الأسبوعية لليوم (اليوم الأخير بالشارت)
+                weeklySales[6] += newOrder.amount;
+
+                // تحديث واجهات لوحة التحكم فوراً
+                calculateStats();
+                renderDashboardOrdersTable();
+                renderAllOrdersTable();
+                updateCharts();
+
+                // إطلاق إشعار صاعد متوهج يبهجه
+                triggerToast("طلب شراء معلق جديد 🕌", `الزبون ${randomName} طلب لتوّه "${randomProduct.name}" بقيمة ${(randomProduct.price + 5000).toLocaleString()} د.ع.`, 'success');
+
+                // إضافة الإشعار للـ Dropdown
+                const notifList = document.getElementById('notif-list');
+                const div = document.createElement('div');
+                div.className = "p-3 text-xs hover:bg-shrine-teal/20 transition";
+                div.innerHTML = `
+                    <p class="text-white font-semibold">🛒 طلب معلق من ${randomName}</p>
+                    <p class="text-gray-400 text-[10px] mt-0.5">الموقع: ${randomProvince.split('،')[0]} - السعر: ${(randomProduct.price + 5000).toLocaleString()} د.ع</p>
+                `;
+                notifList.insertBefore(div, notifList.firstChild);
+
+                const badge = document.getElementById('notif-badge');
+                badge.classList.remove('hidden');
+                badge.textContent = parseInt(badge.textContent || 0) + 1;
+
+            }, 7000);
+        }
+    </script>
+</body>
+</html>
